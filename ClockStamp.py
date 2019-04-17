@@ -105,7 +105,7 @@ if arguments > 3:
     y = int(sys.argv[3]);
 
 # Get creation time
-time = datetime.datetime.fromtimestamp(FileCreated(sys.argv[1]));
+time = datetime.datetime.fromtimestamp(FileCreated(filename));
 hours = time.hour;
 minutes = time.minute;
 
