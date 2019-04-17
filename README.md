@@ -6,15 +6,16 @@ File created at 19:50
 ![alt text](https://github.com/jiinurppa/ClockStamp/raw/master/sample.jpg "Sample Image")
 
 ## Usage
-With default **(15, 15)** clock position:
+Stamp `image.jpg` with
+default **(15, 15)** clock position:
 ```bash
 ClockStamp.py image.jpg
 ```
-With clock at position **(64, 15)**:
+clock at position **(64, 15)**:
 ```bash
 ClockStamp.py image.jpg 64
 ```
-With clock at position **(96, 32)**:
+clock at position **(96, 32)**:
 ```bash
 ClockStamp.py image.jpg 96 32
 ```
