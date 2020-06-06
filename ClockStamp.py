@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python3
 from PIL import Image, ImageDraw, ImageFont
 import platform
 import datetime
@@ -39,95 +39,104 @@ SaEvVh3tjXbHOwY7e2i5KiYVEKGtXtpi734CxcALAaihds9LDYv3H64y9gPQSPthGgE6U09/IRLv
 HYzE+zti3kBNnbfJu8IkWgcaq8PVgbp6gj69I+0k64cB2mX2eukmZiO0x/oHOuO93vqauv+iLa0b
 /fvj0+MtUBxMxLlCfa+FIp5F2WAFG2VhDuRST+ek6LkoOnmUlQUUsSLKjxL61SwlA8ugHCpQUN7u
 7YzU1dUZGUSdsqBnBP0npX/tQF+LwHpnadkuPWcmjsbr2Tv1f5y/AM/8g/A=
-""".replace('\n', '');
+""".replace('\n', '')
 
-def HourToChar(h):
-    if h > 24: return chr(53);
-    if h < 0:  return chr(53);
-    if h > 11: h -= 12;
-    return chr(53 + h);
 
-def MinutesToChar(m):
-    return chr(33 + m / 3);
+def hour_to_char(h):
+    if h > 24:
+        return chr(53)
+    if h < 0:
+        return chr(53)
+    if h > 11:
+        h -= 12
+    return chr(53 + h)
 
-def DrawClock(d, f, h, m, x, y, c, a):
+
+def minutes_to_char(m):
+    return chr(33 + m / 3)
+
+
+def draw_clock(d, f, h, m, xpos, ypos, c, a):
     # Draw hours
-    d.text((x, y), HourToChar(h), font=f, fill=(c, c, c, a));
+    d.text((xpos, ypos), hour_to_char(h), font=f, fill=(c, c, c, a))
     # Draw minutes
-    d.text((x, y), MinutesToChar(m), font=f, fill=(c, c, c, a));
+    d.text((xpos, ypos), minutes_to_char(m), font=f, fill=(c, c, c, a))
 
-def DrawOutlinedClock(d, f, h, m, x, y, c, a, ol):
+
+def draw_outlined_clock(d, f, h, m, xpos, ypos, c, a, ol):
     # Draw outline
-    DrawClock(d, f, h, m, x - ol, y - ol, 0, a);
-    DrawClock(d, f, h, m, x + ol, y - ol, 0, a);
-    DrawClock(d, f, h, m, x + ol, y + ol, 0, a);
-    DrawClock(d, f, h, m, x - ol, y + ol, 0, a);
+    draw_clock(d, f, h, m, xpos - ol, ypos - ol, 0, a)
+    draw_clock(d, f, h, m, xpos + ol, ypos - ol, 0, a)
+    draw_clock(d, f, h, m, xpos + ol, ypos + ol, 0, a)
+    draw_clock(d, f, h, m, xpos - ol, ypos + ol, 0, a)
     # Draw clock
-    DrawClock(d, f, h, m, x, y, c, a);
+    draw_clock(d, f, h, m, xpos, ypos, c, a)
 
-def FileCreated(path):
+
+def file_created(path):
     # http://stackoverflow.com/a/39501288/1709587
     if platform.system() == 'Windows':
-        return os.path.getctime(path);
+        return os.path.getctime(path)
     else:
-        stat = os.stat(path);
+        stat = os.stat(path)
         try:
-            return stat.st_birthtime;
+            return stat.st_birthtime
         except AttributeError:
-            return stat.st_mtime;
+            return stat.st_mtime
+
 
 # Check arguments
-arguments = len(sys.argv);
+arguments = len(sys.argv)
 usage = """usage:
 stamp.py image.jpg
 stamp.py image.jpg xoffset
 stamp.py image.jpg xoffset yoffset
-""";
+"""
 
 if arguments < 2:
-    print(usage);
-    exit();
+    print(usage)
+    exit()
 
 # Setup
-filename = sys.argv[1];
-fontname = 'analogclock.ttf';
-x = 15;
-y = 15;
-size = 128;
-brightness = 255;
-alpha = 128;
-outline = 1;
+filename = sys.argv[1]
+fontname = 'analogclock.ttf'
+x = 15
+y = 15
+size = 128
+brightness = 255
+alpha = 128
+outline = 1
 
 if arguments > 2:
-    x = int(sys.argv[2]);
+    x = int(sys.argv[2])
 
 if arguments > 3:
-    y = int(sys.argv[3]);
+    y = int(sys.argv[3])
 
 # Get creation time
-time = datetime.datetime.fromtimestamp(FileCreated(filename));
-hours = time.hour;
-minutes = time.minute;
+time = datetime.datetime.fromtimestamp(file_created(filename))
+hours = time.hour
+minutes = time.minute
 
 # Load original
-base = Image.open(filename).convert('RGBA');
+base = Image.open(filename).convert('RGBA')
 
 # Create buffer
-overlay = Image.new('RGBA', base.size);
-draw = ImageDraw.Draw(overlay);
+overlay = Image.new('RGBA', base.size)
+draw = ImageDraw.Draw(overlay)
 
 # Write temp font if none exists
 if not os.path.isfile(fontname):
     with open(fontname, 'w') as fdesc:
-        fdesc.write(zlib.decompress(clockfont.decode('base64')));
+        fdesc.write(zlib.decompress(clockfont.decode('base64')))
 
 # Load font
-font = ImageFont.truetype(fontname, size);
+font = ImageFont.truetype(fontname, size)
 
-DrawOutlinedClock(draw, font, hours, minutes, x, y, brightness, alpha, outline);
+draw_outlined_clock(draw, font, hours, minutes, x, y, brightness, alpha, outline)
 
 # Flatten image
-result = Image.alpha_composite(base, overlay).convert('RGB');
+result = Image.alpha_composite(base, overlay).convert('RGB')
 
 # Write file
-result.save(filename);
+result.save(filename)
